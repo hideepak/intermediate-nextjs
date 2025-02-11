@@ -5,6 +5,7 @@ import React from 'react';
 // Assume that useFormState is our React Hook Form–based hook for handling form state
 import { useFormState } from 'react-dom'; // (This is a conceptual hook in this context.)
 import { registerUser, ActionResponse } from '@/actions/auth';
+import SubmitButton from '@/components/SubmitButton'
 
 // Define the initial state matching ActionResponse.
 const initialState: ActionResponse = {
@@ -36,9 +37,7 @@ export default function SignupForm() {
           <p style={{ color: 'red' }}>{formState.errors.password.join(', ')}</p>
         )}
       </div>
-      <button type="submit" disabled={formState.formState.isSubmitting}>
-        {formState.formState.isSubmitting ? 'Submitting...' : 'Sign Up'}
-      </button>
+      <SubmitButton />
       {formState.formState.success && formState.formState.message && (
         <p style={{ color: 'green' }}>{formState.formState.message}</p>
       )}
