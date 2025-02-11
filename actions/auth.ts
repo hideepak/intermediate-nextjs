@@ -2,6 +2,8 @@
 'use server';
 
 import { z } from 'zod';
+import { db } from '@/db/db'
+import { users } from '@/db/schema'
 
 // Define the Zod schema for our sign‑up data
 const authSchema = z.object({
@@ -37,6 +39,18 @@ export async function registerUser(state: ActionResponse, formData: FormData): P
   }
 
   // Here you would normally register the user (e.g., save to your database)
+  try {
+    await db.insert(users).values({
+      email,
+      password,
+    });
+  } catch (error: any) {
+    console.error('Error inserting user:', error);
+    return {
+      errors: { general: ['Error registering user.'] },
+      formState: { success: false, isSubmitting: false },
+    };
+  }
   // For demonstration, assume registration is always successful:
   return {
     errors: null,
