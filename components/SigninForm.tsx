@@ -1,33 +1,64 @@
-'use client'
-import { Input } from '@nextui-org/react'
-import Link from 'next/link'
+// components/SigninForm.tsx
+'use client';
 
-const SigninForm = () => {
+import React from 'react';
+// This is a conceptual hook that binds server actions to form state
+import { useFormState } from 'react-dom';
+import { signinUser, ActionResponse } from '@/actions/auth';
+import SubmitSigninButton from '@/components/SubmitSigninButton'
+
+// Define an initial state matching the ActionResponse structure.
+const initialState: ActionResponse = {
+  errors: null,
+  formState: {
+    success: false,
+    isSubmitting: false,
+  },
+};
+
+export default function SigninForm() {
+  // useFormState takes the server action and an initial state, and returns a tuple:
+  // [formState, action]. The action function is passed to the form’s action attribute.
+  const [formState, action] = useFormState(signinUser, initialState);
+
+  // Optionally, you could add a ref to the form element if you want to clear it on success:
+  // const formRef = React.useRef<HTMLFormElement>(null);
+  // React.useEffect(() => {
+  //   if (formState.formState.success && formRef.current) {
+  //     formRef.current.reset();
+  //   }
+  // }, [formState.formState.success]);
+
   return (
-    <form className="bg-content1 border border-default-100 shadow-lg rounded-md p-3 flex flex-col gap-2 ">
-      <h3 className="my-4">Sign in</h3>
-      <Input
-        fullWidth
-        required
-        size="lg"
-        placeholder="Email"
-        name="email"
-        type="email"
-      />
-      <Input
-        name="password"
-        fullWidth
-        required
-        size="lg"
-        type="password"
-        placeholder="Password"
-      />
-
+    <form action={action} /* ref={formRef} */>
       <div>
-        <Link href="/signup">{`Don't have an account?`}</Link>
+        <label htmlFor="email">Email:</label>
+        <input
+          id="email"
+          type="email"
+          name="email"
+          placeholder="Enter your email"
+        />
+        {formState.errors?.email && (
+          <p style={{ color: 'red' }}>{formState.errors.email.join(', ')}</p>
+        )}
       </div>
+      <div>
+        <label htmlFor="password">Password:</label>
+        <input
+          id="password"
+          type="password"
+          name="password"
+          placeholder="Enter your password"
+        />
+        {formState.errors?.password && (
+          <p style={{ color: 'red' }}>{formState.errors.password.join(', ')}</p>
+        )}
+      </div>
+      <SubmitSigninButton />
+      {formState.formState.success && formState.formState.message && (
+        <p style={{ color: 'green' }}>{formState.formState.message}</p>
+      )}
     </form>
-  )
+  );
 }
-
-export default SigninForm
