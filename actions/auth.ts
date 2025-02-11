@@ -10,16 +10,18 @@ const authSchema = z.object({
 });
 
 // Define the type for the action's response
-type ActionResponse = {
+export type ActionResponse = {
   errors: Record<string, string[]> | null;
   formState: {
     success: boolean;
     message?: string;
+    isSubmitting: boolean;
+
   };
 };
 
 // The server action for registering a user
-export async function registerUser(prevState: unknown, formData: FormData): Promise<ActionResponse> {
+export async function registerUser(state: ActionResponse, formData: FormData): Promise<ActionResponse> {
   // Extract values from the FormData object
   const email = formData.get('email')?.toString() || '';
   const password = formData.get('password')?.toString() || '';
@@ -30,7 +32,7 @@ export async function registerUser(prevState: unknown, formData: FormData): Prom
     // Return the errors in a structured format
     return {
       errors: result.error.flatten().fieldErrors,
-      formState: { success: false },
+      formState: { success: false, isSubmitting: false },
     };
   }
 
@@ -38,6 +40,6 @@ export async function registerUser(prevState: unknown, formData: FormData): Prom
   // For demonstration, assume registration is always successful:
   return {
     errors: null,
-    formState: { success: true, message: 'User registered successfully!' },
+    formState: { success: true, message: 'User registered successfully!', isSubmitting: false },
   };
 }
