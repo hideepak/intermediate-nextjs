@@ -4,11 +4,10 @@ import { db } from '@/db/db'
 import { eq } from 'drizzle-orm'
 import { users } from '@/db/schema'
 import bcrypt from 'bcrypt'
-
-const SECRET = 'use_an_ENV_VAR'
+import { JWT_SECRET } from '@/config'
 
 export const createTokenForUser = (userId: string) => {
-  const token = jwt.sign({ id: userId }, SECRET)
+  const token = jwt.sign({ id: userId }, JWT_SECRET)
   return token
 }
 
@@ -16,7 +15,7 @@ export const getUserFromToken = async (token: {
   name: string
   value: string
 }) => {
-  const payload = jwt.verify(token.value, SECRET) as { id: string }
+  const payload = jwt.verify(token.value, JWT_SECRET) as { id: string }
 
   const user = await db.query.users.findFirst({
     where: eq(users.id, payload.id),

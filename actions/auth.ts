@@ -4,6 +4,10 @@
 import { z } from 'zod';
 import { db } from '@/db/db'
 import { users } from '@/db/schema'
+import jwt from 'jsonwebtoken'
+import { eq } from 'drizzle-orm'
+import { COOKIENAME, JWT_SECRET } from '@/config'
+import { cookies } from 'next/headers'
 
 // Define the Zod schema for our sign‑up data
 const authSchema = z.object({
@@ -87,13 +91,42 @@ export async function signinUser(
   }
 
   // OPTIONAL: Check the credentials against your database
-  // const user = await db.select().from(users).where(/* your condition here */);
-  // if (!user || user.password !== password) {
-  //   return {
-  //     errors: { general: ['Invalid email or password'] },
-  //     formState: { success: false, isSubmitting: false },
-  //   };
-  // }
+   const resultDb = await db.select().from(users).where(eq(users.email, email));
+   const user = resultDb.length > 0 ? resultDb[0] : null;
+   if (!user || user.password !== password) {
+     return {
+      errors: { general: ['Invalid email or password'] },
+      formState: { success: false, isSubmitting: false },
+    };
+   }
+
+  // Generate a JWT token containing essential user information.
+  // The token is set to expire in 1 hour.
+  const token = jwt.sign(
+                            {
+                              id: user.id,
+                              email: user.email
+                            },
+                            JWT_SECRET,
+                            {
+                              expiresIn: '1h',
+                            }
+                          );
+
+  // Set the JWT token in a secure HTTP-only cookie.
+  // Using next/headers' mutable cookies API allows you to set the cookie in a server action.
+  cookies().set({
+    name: COOKIENAME,
+    value: token,
+    path: '/', // Cookie available on all routes.
+    httpOnly: true, // Not accessible from client-side JavaScript.
+    secure: process.env.NODE_ENV === 'production', // Only transmit over HTTPS in production.
+    sameSite: 'strict', // Helps prevent CSRF.
+    maxAge: 3600, // 1 hour expressed in seconds.
+  });
+
+  // Optionally, you can perform a redirect here instead of returning a response.
+  // For example, redirect('/dashboard');
 
   // For demonstration purposes, we assume the sign‑in is successful.
   return {
