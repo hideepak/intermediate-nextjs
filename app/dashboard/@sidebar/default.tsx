@@ -1,5 +1,6 @@
 // app/(dashboard)/@sidebar/page.tsx
 import React from 'react';
+import Link from 'next/link'
 
 export default function Sidebar() {
   return (
@@ -7,9 +8,9 @@ export default function Sidebar() {
       <h2>Dashboard Sidebar</h2>
       <nav>
         <ul>
-          <li><a href="/dashboard">Overview</a></li>
-          <li><a href="/dashboard/settings">Settings</a></li>
-          <li><a href="/dashboard/profile">Profile</a></li>
+          <Link href="/dashboard/settings">D-Overview</Link>
+          <Link href="/dashboard/settings">D-Settings</Link>
+          <Link href="/dashboard/profile">D-Profile </Link>
         </ul>
       </nav>
     </div>
