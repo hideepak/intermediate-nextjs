@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getUserFromToken } from './authTools'; // Your helper to decode/verify JWTs
 import { COOKIENAME } from '@/config'; // Your constant for the cookie name
+import { cache } from 'react';
 
 /**
  * Define a TypeScript interface for the authenticated user.
@@ -22,7 +23,8 @@ export interface User {
  *
  * @returns {Promise<User>} A promise that resolves to the authenticated user object.
  */
-export async function getCurrentUser(): Promise<User> {
+export const getCurrentUser = cache(
+  async (): Promise<User> => {
   // Retrieve the token from cookies using Next.js's headers API.
   const cookieStore = cookies();
   const tokenCookie = cookieStore.get(COOKIENAME);
@@ -32,7 +34,7 @@ export async function getCurrentUser(): Promise<User> {
     redirect('/signin');
   }
 
- // const token = tokenCookie!.value; // Non-null assertion as we know tokenCookie exists here
+  // const token = tokenCookie!.value; // Non-null assertion as we know tokenCookie exists here
 
   let user: User | undefined = undefined;
   try {
@@ -51,4 +53,4 @@ export async function getCurrentUser(): Promise<User> {
   }
 
   return user;
-}
+});
