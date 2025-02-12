@@ -40,7 +40,7 @@ export default function Sidebar() {
             {/*
                 The <Link> element receives conditional styling:
                 - If active, it gets a blue background and white text.
-                - Otherwise, it gets gray text and a hover effect.
+                - Otherwise, it gets gray text and a hover effect. -
               */}
             <Link className={clsx(
               'block px-4 py-2 rounded transition-colors duration-200',
